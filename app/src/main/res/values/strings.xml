@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">MVVMCoroutines</string>
+    <string name="home_get_data">Get data</string>
+</resources>

@@ -1,0 +1,57 @@
+package es.jarroyo.mvvmcoroutines.data.source.network
+
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import com.microhealth.lmc.utils.NetworkSystemAbstract
+import es.jarroyo.mvvmcoroutines.data.exception.NetworkConnectionException
+import es.jarroyo.mvvmcoroutines.domain.usecase.getGitHubRepositoriesList.GetGitHubReposRequest
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
+class NetworkDataSource(private val networkSystem: NetworkSystemAbstract) : INetworkDataSource(networkSystem) {
+
+    /**
+     * GET GITHUB DATA
+     */
+    override suspend fun getGitHubData(request: GetGitHubReposRequest): List<GithubAPI.Repo> {
+
+        if (networkSystem.isNetworkAvailable()) {
+            val retrofit = Retrofit.Builder().apply {
+                baseUrl("https://api.github.com")
+                addConverterFactory(GsonConverterFactory.create())
+                addCallAdapterFactory(CoroutineCallAdapterFactory())
+            }.build()
+
+            val github = retrofit.create(GithubAPI::class.java)
+            val repositories =
+                github.listRepos(request.username)
+                    .await().take(10)
+            return repositories
+        } else {
+            throw NetworkConnectionException()
+        }
+        // return github.users().await()
+    }
+
+    /**
+     * GET GITHUB DATA
+     */
+    /*override suspend fun getGitHubContributors(request: GetGitHubContributorsRequest): List<GithubAPI.Contributor> {
+
+        if (networkSystem.isNetworkAvailable()) {
+            val retrofit = Retrofit.Builder().apply {
+                baseUrl("https://api.github.com")
+                addConverterFactory(GsonConverterFactory.create())
+                addCallAdapterFactory(CoroutineCallAdapterFactory())
+            }.build()
+
+            val github = retrofit.create(GithubAPI::class.java)
+            val contributors =
+                github.contributors(request.owner, request.repositorie)
+                    .await().take(10)
+            return contributors
+        } else {
+            throw NetworkConnectionException()
+        }
+        // return github.users().await()
+    }*/
+}
