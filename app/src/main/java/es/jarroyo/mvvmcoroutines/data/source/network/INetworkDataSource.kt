@@ -1,6 +1,7 @@
 package es.jarroyo.mvvmcoroutines.data.source.network
 
 import com.microhealth.lmc.utils.NetworkSystemAbstract
+import es.jarroyo.mvvmcoroutines.domain.usecase.getGitHubContributors.GetGitHubContributorsRequest
 import es.jarroyo.mvvmcoroutines.domain.usecase.getGitHubRepositoriesList.GetGitHubReposRequest
 
 open abstract class INetworkDataSource(private val networkSystem: NetworkSystemAbstract) {
@@ -13,5 +14,5 @@ open abstract class INetworkDataSource(private val networkSystem: NetworkSystemA
     /**
      * GET GITHUB DATA
      */
-    //abstract suspend fun getGitHubContributors(request: GetGitHubContributorsRequest): List<GithubAPI.Contributor>
+    abstract suspend fun getGitHubContributors(request: GetGitHubContributorsRequest): List<GithubAPI.Contributor>
 }

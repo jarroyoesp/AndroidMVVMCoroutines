@@ -3,6 +3,7 @@ package es.jarroyo.mvvmcoroutines.data.source.network
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.microhealth.lmc.utils.NetworkSystemAbstract
 import es.jarroyo.mvvmcoroutines.data.exception.NetworkConnectionException
+import es.jarroyo.mvvmcoroutines.domain.usecase.getGitHubContributors.GetGitHubContributorsRequest
 import es.jarroyo.mvvmcoroutines.domain.usecase.getGitHubRepositoriesList.GetGitHubReposRequest
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -35,7 +36,7 @@ class NetworkDataSource(private val networkSystem: NetworkSystemAbstract) : INet
     /**
      * GET GITHUB DATA
      */
-    /*override suspend fun getGitHubContributors(request: GetGitHubContributorsRequest): List<GithubAPI.Contributor> {
+    override suspend fun getGitHubContributors(request: GetGitHubContributorsRequest): List<GithubAPI.Contributor> {
 
         if (networkSystem.isNetworkAvailable()) {
             val retrofit = Retrofit.Builder().apply {
@@ -52,6 +53,5 @@ class NetworkDataSource(private val networkSystem: NetworkSystemAbstract) : INet
         } else {
             throw NetworkConnectionException()
         }
-        // return github.users().await()
-    }*/
+    }
 }

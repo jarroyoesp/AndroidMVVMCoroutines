@@ -5,6 +5,7 @@ import dagger.Binds
 import dagger.MapKey
 import dagger.Module
 import dagger.multibindings.IntoMap
+import es.jarroyo.mvvmcoroutines.ui.detail.viewmodel.ContributorListViewModel
 import es.jarroyo.mvvmcoroutines.ui.home.viewmodel.RepositorieListViewModel
 import kotlin.reflect.KClass
 
@@ -18,4 +19,10 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(RepositorieListViewModel::class)
     abstract fun bindRepositoriesListViewModel(viewModel: RepositorieListViewModel): ViewModel
+
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ContributorListViewModel::class)
+    abstract fun bindContributorListViewModel(viewModel: ContributorListViewModel): ViewModel
 }

@@ -100,6 +100,7 @@ class HomeActivity : BaseActivity() {
         mRvAdapter = HomeRvAdapter(repositorieList, listenerRepositorieClicked = {
             // ON CLICK
             Toast.makeText(this, "OnCick: ${it.repositorue.name}", Toast.LENGTH_SHORT).show()
+            navigator.addContributorListFragment(R.id.activity_home_layout_main, it.repositorue.name)
         })
 
         activity_home_rv.adapter = mRvAdapter

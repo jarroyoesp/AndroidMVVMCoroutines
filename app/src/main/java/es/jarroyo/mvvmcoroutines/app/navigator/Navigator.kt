@@ -3,6 +3,7 @@ package es.jarroyo.mvvmcoroutines.app.navigator
 import android.content.Intent
 import android.os.Bundle
 import es.jarroyo.mvvmcoroutines.ui.base.BaseActivity
+import es.jarroyo.mvvmcoroutines.ui.detail.fragment.ContributorListFragment
 
 class Navigator {
 
@@ -46,10 +47,10 @@ class Navigator {
     /**
      * ADD HOME FRAGMENT
      */
-    fun addHomeFragment(contentIdLayout: Int) {
-        /*var homeFragment = HomeFragment()
+    fun addContributorListFragment(contentIdLayout: Int, repositorieName: String) {
+        var contributorListFragment = ContributorListFragment.newInstance(repositorieName)
         val ft = currentActivity?.supportFragmentManager?.beginTransaction()
-        ft?.addToBackStack(HomeFragment::class.java.simpleName)
-        ft?.replace(contentIdLayout, homeFragment)?.commit()*/
+        ft?.addToBackStack(ContributorListFragment::class.java.simpleName)
+        ft?.replace(contentIdLayout, contributorListFragment)?.commit()
     }
 }
