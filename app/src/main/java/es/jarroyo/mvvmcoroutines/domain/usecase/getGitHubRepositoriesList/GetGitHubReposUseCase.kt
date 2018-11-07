@@ -7,7 +7,7 @@ import es.jarroyo.mvvmcoroutines.domain.usecase.base.BaseUseCase
 import es.jarroyo.mvvmcoroutines.domain.usecase.base.Response
 import retrofit2.HttpException
 
-const val LIMIT_CRYPTO_LIST = 20
+const val LIMIT_REPOS_LIST = 20
 
 class GetGitHubReposUseCase(val repository: GitHubRepository) : BaseUseCase<GetGitHubReposRequest, List<GithubAPI.Repo>>() {
 

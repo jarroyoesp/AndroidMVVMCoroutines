@@ -57,8 +57,8 @@ class HomeActivity : BaseActivity() {
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(RepositorieListViewModel::class.java)
         observeViewModel()
         savedInstanceState?.let {
-            viewModel.restoreCryptoList()
-        } ?: viewModel.updateCryptoList()
+            viewModel.restoreRepositorieList()
+        } ?: viewModel.updateRepositorieList()
 
         configView()
     }
@@ -77,7 +77,7 @@ class HomeActivity : BaseActivity() {
      */
     private fun configView() {
         activity_home_button_get_data.setOnClickListener{
-            viewModel.updateCryptoList()
+            viewModel.updateRepositorieList()
         }
     }
 

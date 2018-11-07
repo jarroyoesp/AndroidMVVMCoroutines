@@ -5,7 +5,7 @@ import android.arch.lifecycle.ViewModel
 import es.jarroyo.mvvmcoroutines.data.source.network.GithubAPI
 import es.jarroyo.mvvmcoroutines.domain.usecase.getGitHubRepositoriesList.GetGitHubReposRequest
 import es.jarroyo.mvvmcoroutines.domain.usecase.getGitHubRepositoriesList.GetGitHubReposUseCase
-import es.jarroyo.mvvmcoroutines.domain.usecase.getGitHubRepositoriesList.LIMIT_CRYPTO_LIST
+import es.jarroyo.mvvmcoroutines.domain.usecase.getGitHubRepositoriesList.LIMIT_REPOS_LIST
 import es.jarroyo.mvvmcoroutines.ui.home.model.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,44 +37,44 @@ class RepositorieListViewModel
         stateLiveData.value = DefaultState(0, false, emptyList())
     }
 
-    fun updateCryptoList() {
+    fun updateRepositorieList() {
         uiScope.launch {
             val pageNum = obtainCurrentPageNum()
             stateLiveData.value = if (pageNum == 0)
                 LoadingState(pageNum, false, obtainCurrentData())
             else
                 PaginatingState(pageNum, false, obtainCurrentData())
-            getCryptoList(pageNum)
+            getRepositorieList(pageNum)
         }
     }
 
-    fun resetCryptoList() {
+    fun resetRepositorieList() {
         uiScope.launch {
             val pageNum = 0
             stateLiveData.value = LoadingState(pageNum, false, emptyList())
-            updateCryptoList()
+            updateRepositorieList()
         }
     }
 
-    fun restoreCryptoList() {
+    fun restoreRepositorieList() {
         val pageNum = obtainCurrentPageNum()
         stateLiveData.value = DefaultState(pageNum, false, obtainCurrentData())
     }
 
-    private fun getCryptoList(page: Int) {
+    private fun getRepositorieList(page: Int) {
         uiScope.launch {
             val request = GetGitHubReposRequest("jarroyoesp")
             val responseRepositorieList = getGitHubReposUseCase.execute(request)
-            onCryptoListReceived(responseRepositorieList.data!!)
+            onRepositorieListReceived(responseRepositorieList.data!!)
         }
     }
 
-    private fun onCryptoListReceived(cryptoList: List<GithubAPI.Repo>) {
-        val currentCryptoList = obtainCurrentData().toMutableList()
+    private fun onRepositorieListReceived(repositorieList: List<GithubAPI.Repo>) {
+        val currentRepositorieList = obtainCurrentData().toMutableList()
         val currentPageNum = obtainCurrentPageNum() + 1
-        val areAllItemsLoaded = cryptoList.size < LIMIT_CRYPTO_LIST
-        currentCryptoList.addAll(cryptoList)
-        stateLiveData.value = DefaultState(currentPageNum, areAllItemsLoaded, currentCryptoList)
+        val areAllItemsLoaded = repositorieList.size < LIMIT_REPOS_LIST
+        currentRepositorieList.addAll(repositorieList)
+        stateLiveData.value = DefaultState(currentPageNum, areAllItemsLoaded, currentRepositorieList)
     }
 
     private fun onError(error: Throwable) {
