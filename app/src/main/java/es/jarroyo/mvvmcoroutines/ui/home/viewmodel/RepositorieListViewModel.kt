@@ -3,6 +3,7 @@ package es.jarroyo.mvvmcoroutines.ui.home.viewmodel
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import es.jarroyo.mvvmcoroutines.data.source.network.GithubAPI
+import es.jarroyo.mvvmcoroutines.domain.usecase.base.Response
 import es.jarroyo.mvvmcoroutines.domain.usecase.getGitHubRepositoriesList.GetGitHubReposRequest
 import es.jarroyo.mvvmcoroutines.domain.usecase.getGitHubRepositoriesList.GetGitHubReposUseCase
 import es.jarroyo.mvvmcoroutines.domain.usecase.getGitHubRepositoriesList.LIMIT_REPOS_LIST
@@ -34,7 +35,7 @@ class RepositorieListViewModel
     val stateLiveData = MutableLiveData<ReposiorieListState>()
 
     init {
-        stateLiveData.value = DefaultState(0, false, emptyList())
+        stateLiveData.value = DefaultState(0, false, Response(emptyList()))
     }
 
     fun updateRepositorieList() {
@@ -51,7 +52,7 @@ class RepositorieListViewModel
     fun resetRepositorieList() {
         uiScope.launch {
             val pageNum = 0
-            stateLiveData.value = LoadingState(pageNum, false, emptyList())
+            stateLiveData.value = LoadingState(pageNum, false, Response(emptyList()))
             updateRepositorieList()
         }
     }
@@ -65,27 +66,35 @@ class RepositorieListViewModel
         uiScope.launch {
             val request = GetGitHubReposRequest("jarroyoesp")
             val responseRepositorieList = getGitHubReposUseCase.execute(request)
-            onRepositorieListReceived(responseRepositorieList.data!!)
+            proccessResponse(responseRepositorieList)
+        }
+    }
+
+    private fun proccessResponse(response: Response<List<GithubAPI.Repo>>){
+        if (response.error == null && response.data != null) {
+            onRepositorieListReceived(response.data!!)
+        } else if (response.error != null) {
+            onError(response.error!!)
         }
     }
 
     private fun onRepositorieListReceived(repositorieList: List<GithubAPI.Repo>) {
-        val currentRepositorieList = obtainCurrentData().toMutableList()
+        val currentRepositorieList = obtainCurrentData().data!!.toMutableList()
         val currentPageNum = obtainCurrentPageNum() + 1
         val areAllItemsLoaded = repositorieList.size < LIMIT_REPOS_LIST
         currentRepositorieList.addAll(repositorieList)
-        stateLiveData.value = DefaultState(currentPageNum, areAllItemsLoaded, currentRepositorieList)
+        stateLiveData.value = DefaultState(currentPageNum, areAllItemsLoaded, Response(currentRepositorieList))
     }
 
-    private fun onError(error: Throwable) {
+    private fun onError(error: String) {
         val pageNum = stateLiveData.value?.pageNum ?: 0
         stateLiveData.value =
-                ErrorState(error.message ?: "", pageNum, obtainCurrentLoadedAllItems(), obtainCurrentData())
+                ErrorState(error ?: "", pageNum, obtainCurrentLoadedAllItems(), obtainCurrentData())
     }
 
     private fun obtainCurrentPageNum() = stateLiveData.value?.pageNum ?: 0
 
-    private fun obtainCurrentData() = stateLiveData.value?.data ?: emptyList()
+    private fun obtainCurrentData() = stateLiveData.value?.response ?: Response(emptyList())
 
     private fun obtainCurrentLoadedAllItems() = stateLiveData.value?.loadedAllItems ?: false
 

@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
+import android.widget.Toast
 import es.jarroyo.mvvmcoroutines.R
 import es.jarroyo.mvvmcoroutines.app.di.component.ApplicationComponent
 import es.jarroyo.mvvmcoroutines.app.di.subcomponent.home.activity.HomeActivityModule
@@ -36,7 +37,7 @@ class HomeActivity : BaseActivity() {
             when (state) {
                 is DefaultState -> {
                     isLoading = false
-                    updateView(it.data)
+                    showRepositories(it.response.data!!)
                 }
                 is LoadingState -> {
                     isLoading = true
@@ -46,6 +47,7 @@ class HomeActivity : BaseActivity() {
                 }
                 is ErrorState -> {
                     isLoading = false
+                    showError((it as ErrorState).errorMessage)
                 }
             }
         }
@@ -81,11 +83,15 @@ class HomeActivity : BaseActivity() {
         }
     }
 
-    private fun updateView(respositoriesList: List<GithubAPI.Repo>){
+    private fun showRepositories(respositoriesList: List<GithubAPI.Repo>){
         var text = ""
         for (repositorie in respositoriesList) {
             text = text + "${repositorie.name}\n"
         }
         activity_home_tv_data.text = text
+    }
+
+    private fun showError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
