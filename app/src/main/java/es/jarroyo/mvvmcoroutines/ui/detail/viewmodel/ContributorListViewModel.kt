@@ -88,4 +88,9 @@ class ContributorListViewModel
     }
 
     private fun obtainCurrentData() = stateLiveData.value?.response ?: Response(emptyList())
+
+    override fun onCleared() {
+        super.onCleared()
+        presenterJob.cancel()
+    }
 }

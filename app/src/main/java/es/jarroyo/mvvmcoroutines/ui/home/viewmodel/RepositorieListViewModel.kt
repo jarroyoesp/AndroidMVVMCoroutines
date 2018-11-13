@@ -98,4 +98,9 @@ class RepositorieListViewModel
 
     private fun obtainCurrentLoadedAllItems() = stateLiveData.value?.loadedAllItems ?: false
 
+
+    override fun onCleared() {
+        super.onCleared()
+        presenterJob.cancel()
+    }
 }
