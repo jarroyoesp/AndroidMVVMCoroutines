@@ -2,16 +2,14 @@ package es.jarroyo.mvvmcoroutines.ui.home.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import android.util.Log
 import es.jarroyo.mvvmcoroutines.data.source.network.GithubAPI
 import es.jarroyo.mvvmcoroutines.domain.usecase.base.Response
 import es.jarroyo.mvvmcoroutines.domain.usecase.getGitHubRepositoriesList.GetGitHubReposRequest
 import es.jarroyo.mvvmcoroutines.domain.usecase.getGitHubRepositoriesList.GetGitHubReposUseCase
 import es.jarroyo.mvvmcoroutines.domain.usecase.getGitHubRepositoriesList.LIMIT_REPOS_LIST
 import es.jarroyo.mvvmcoroutines.ui.home.model.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class RepositorieListViewModel
@@ -39,7 +37,7 @@ class RepositorieListViewModel
     }
 
     fun updateRepositorieList() {
-        uiScope.launch {
+        uiScope.launch(exceptionHandler) {
             val pageNum = obtainCurrentPageNum()
             stateLiveData.value = if (pageNum == 0)
                 LoadingState(pageNum, false, obtainCurrentData())
@@ -50,7 +48,7 @@ class RepositorieListViewModel
     }
 
     fun resetRepositorieList() {
-        uiScope.launch {
+        uiScope.launch(exceptionHandler) {
             val pageNum = 0
             stateLiveData.value = LoadingState(pageNum, false, Response(emptyList()))
             updateRepositorieList()
@@ -63,7 +61,7 @@ class RepositorieListViewModel
     }
 
     private fun getRepositorieList(page: Int) {
-        uiScope.launch {
+        uiScope.launch(exceptionHandler) {
             val request = GetGitHubReposRequest("jarroyoesp")
             val responseRepositorieList = getGitHubReposUseCase.execute(request)
             proccessResponse(responseRepositorieList)
@@ -98,6 +96,13 @@ class RepositorieListViewModel
 
     private fun obtainCurrentLoadedAllItems() = stateLiveData.value?.loadedAllItems ?: false
 
+
+    private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+        Log.e("Exception", ":" + throwable)
+        val pageNum = stateLiveData.value?.pageNum ?: 0
+        stateLiveData.value =
+                ErrorState(throwable.toString() ?: "", pageNum, obtainCurrentLoadedAllItems(), obtainCurrentData())
+    }
 
     override fun onCleared() {
         super.onCleared()

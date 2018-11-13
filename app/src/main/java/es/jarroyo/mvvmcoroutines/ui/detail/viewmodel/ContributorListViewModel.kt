@@ -2,6 +2,7 @@ package es.jarroyo.mvvmcoroutines.ui.detail.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import android.util.Log
 import es.jarroyo.mvvmcoroutines.data.source.network.GithubAPI
 import es.jarroyo.mvvmcoroutines.domain.usecase.base.Response
 import es.jarroyo.mvvmcoroutines.domain.usecase.getGitHubContributors.GetGitHubContributorsRequest
@@ -10,10 +11,7 @@ import es.jarroyo.mvvmcoroutines.ui.detail.model.ContributorListState
 import es.jarroyo.mvvmcoroutines.ui.detail.model.DefaultContributorListState
 import es.jarroyo.mvvmcoroutines.ui.detail.model.ErrorContributorListState
 import es.jarroyo.mvvmcoroutines.ui.detail.model.LoadingContributorListState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class ContributorListViewModel
@@ -41,7 +39,7 @@ class ContributorListViewModel
     }
 
     fun updateContributorList(respositorieName: String) {
-        uiScope.launch {
+        uiScope.launch(exceptionHandler) {
             stateLiveData.value =
                 LoadingContributorListState(obtainCurrentData())
             getContributorList(respositorieName)
@@ -49,7 +47,7 @@ class ContributorListViewModel
     }
 
     fun resetContributorList(respositorieName: String) {
-        uiScope.launch {
+        uiScope.launch(exceptionHandler) {
             val pageNum = 0
             stateLiveData.value = LoadingContributorListState(Response(emptyList()))
             updateContributorList(respositorieName)
@@ -61,7 +59,7 @@ class ContributorListViewModel
     }
 
     private fun getContributorList(respositorieName: String) {
-        uiScope.launch {
+        uiScope.launch(exceptionHandler) {
             val request = GetGitHubContributorsRequest("jarroyoesp", respositorieName)
             val responseRepositorieList = getGitHubContributorsUseCase.execute(request)
             proccessResponse(responseRepositorieList)
@@ -88,6 +86,12 @@ class ContributorListViewModel
     }
 
     private fun obtainCurrentData() = stateLiveData.value?.response ?: Response(emptyList())
+
+    private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+        Log.e("Exception", ":" + throwable)
+        stateLiveData.value =
+                ErrorContributorListState(throwable.toString() ?: "", obtainCurrentData())
+    }
 
     override fun onCleared() {
         super.onCleared()
